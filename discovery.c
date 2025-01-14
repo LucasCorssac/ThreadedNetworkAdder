@@ -171,6 +171,13 @@ void SendMessage(char *message, char *ip, int port, char *returnMessage, bool ex
     if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) == -1)
         printf("ERROR opening socket\n");
 
+    // GIVE BROADCAST PERMISSION	
+	int broadcastPermission;
+	broadcastPermission = 1;
+	if (setsockopt(sockfd, SOL_SOCKET, SO_BROADCAST, (void *) &broadcastPermission, sizeof(broadcastPermission)) < 0)
+		perror("setsockopt error");
+
+
     // // BIND SOCKET
 	memset(&my_addr, 0, sizeof(my_addr));
 	my_addr.sin_family = AF_INET;
@@ -190,7 +197,7 @@ void SendMessage(char *message, char *ip, int port, char *returnMessage, bool ex
     n = sendto(sockfd, message, strlen(message), 0, (const struct sockaddr *)&dest_Addr, sizeof(struct sockaddr_in));
     if (n < 0)
     {
-        printf("ERROR sendto\n");
+        perror("ERROR sendto\n");
         exit(EXIT_FAILURE);
     }
     printf("Message \"%s\" sent\n", message);
